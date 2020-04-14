@@ -4,5 +4,12 @@
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "build",
-  "cordova": {}
+  "cordova": {},
+  "server": {
+    "url": "http://0.0.0.0:8100",
+    "hostname": "app",
+    "iosScheme": "ionic",
+    "androidScheme": "http",
+    "allowNavigation": ["example.org", "*.example.org", "192.0.2.1"]
+  }
 }
