@@ -13,24 +13,37 @@ import {
 
 export const usePhotoGallery = () => {
   const { getPhoto } = useCamera();
+  const { deleteFile, getUri, readFile, writeFile } = useFilesystem();
   const [photos, setPhotos] = useState<Photo[]>([]);
 
   const takePhoto = async () => {
-    const fileName = new Date().getTime() + ".jpeg";
     const cameraPhoto = await getPhoto({
       resultType: CameraResultType.Uri,
       source: CameraSource.Camera,
       quality: 100,
     });
-    const newPhotos = [
-      {
-        filePath: fileName,
-        webViewPath: cameraPhoto.webPath,
-      },
-      ...photos,
-    ];
+    const fileName = new Date().getTime() + ".jpeg";
+    const savedFileImage = await savePicture(cameraPhoto, fileName);
+    const newPhotos = [savedFileImage, ...photos];
     setPhotos(newPhotos);
   };
+
+  const savePicture = async (photo: CameraPhoto, fileName: string) => {
+    const base64Data = await base64FromPath(photo.webPath!);
+    await writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: FilesystemDirectory.Data,
+    });
+
+    // Use webPath to display the new image instead of base64 since it's
+    // already loaded into memory
+    return {
+      filepath: fileName,
+      webviewPath: photo.webPath,
+    };
+  };
+
   return {
     photos,
     takePhoto,
